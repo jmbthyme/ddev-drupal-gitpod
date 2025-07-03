@@ -1,0 +1,12 @@
+services:
+  carbon_copy_node.entity.form_builder:
+    class: Drupal\carbon_copy_node\Entity\CarbonCopyNodeEntityFormBuilder
+    arguments:
+      - '@form_builder'
+      - '@entity_type.bundle.info'
+      - '@config.factory'
+      - '@module_handler'
+      - '@entity_type.manager'
+      - '@current_user'
+      - '@tempstore.private'
+      - '@string_translation'

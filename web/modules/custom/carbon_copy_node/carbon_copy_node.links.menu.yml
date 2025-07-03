@@ -1,0 +1,5 @@
+carbon_copy_node.config_menu:
+  title: "Carbon Copy Node Settings"
+  route_name: carbon_copy_node.settings
+  parent: system.admin_config_content
+  description: 'Configure settings related to copying nodes with the Carbon Copy Node module.'

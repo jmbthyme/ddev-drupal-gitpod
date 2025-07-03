@@ -1,0 +1,6 @@
+carbon_copy_node.node.carbon_copy_node:
+  route_name: carbon_copy_node.node.carbon_copy_node
+  base_route: entity.node.canonical
+  group: node
+  title: Carbon Copy Node
+  weight: 5

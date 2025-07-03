@@ -1,0 +1,5 @@
+Administer Carbon Copy Node Settings:
+  title: 'Carbon Copy Node Settings'
+  description: 'Administer Carbon Copy Node Settings'
+permission_callbacks:
+  - \Drupal\carbon_copy_node\CarbonCopyNodePermissions::carbonCopyNodeTypePermissions

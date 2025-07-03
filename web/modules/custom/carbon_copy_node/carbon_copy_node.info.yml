@@ -1,0 +1,7 @@
+name: Carbon Copy Node
+type: module
+description: 'Carbon copy a node.'
+core_version_requirement: ^10 || ^11
+configure: carbon_copy_node.settings
+dependencies:
+  - drupal:node
