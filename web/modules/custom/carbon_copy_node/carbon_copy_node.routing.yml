@@ -1,0 +1,20 @@
+carbon_copy_node.node.carbon_copy_node:
+  path: '/node/{node}/carbon-copy'
+  defaults:
+    _controller: '\Drupal\carbon_copy_node\Controller\CarbonCopyNodeController::copyNode'
+    _title_callback: '\Drupal\carbon_copy_node\Controller\CarbonCopyNodeController::copyPageTitle'
+  requirements:
+    _entity_access: 'node.carbon_copy_node'
+  options:
+    _node_operation_route: TRUE
+    parameters:
+      node:
+        type: entity:node
+
+carbon_copy_node.settings:
+  path: '/admin/config/carbon-copy-node'
+  defaults:
+    _form: '\Drupal\carbon_copy_node\Form\CarbonCopyNodeNodeSettingsForm'
+    _title: 'Carbon Copy Node Setting'
+  requirements:
+    _permission: 'Administer Carbon Copy Node Settings'

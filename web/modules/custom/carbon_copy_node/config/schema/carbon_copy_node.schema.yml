@@ -1,0 +1,10 @@
+carbon_copy_node.settings:
+  type: config_object
+  label: 'Carbon Copy Node settings'
+  mapping:
+    text_to_prepend_to_title:
+      type: string
+      label: 'Text to prepend to title'
+    carbon_copy_status:
+      type: string
+      label: 'Carbon Copied Node node status'

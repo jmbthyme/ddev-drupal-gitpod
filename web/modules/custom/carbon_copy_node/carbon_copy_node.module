@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * @file
+ * Contains carbon_copy_node.module.
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\ContentEntityFormInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_entity_type_build().
+ */
+function carbon_copy_node_entity_type_build(array &$entity_types) {
+  if (isset($entity_types['node'])) {
+    $entity_types['node']->setFormClass('carbon_copy_node', 'Drupal\carbon_copy_node\Form\CarbonCopyNodeNodeForm');
+  }
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function carbon_copy_node_entity_operation(EntityInterface $entity) {
+  $operations = [];
+
+  // Only add an operation for node entities.
+  if ($entity->getEntityTypeId() !== 'node') {
+    return $operations;
+  }
+
+  if ($entity->access('carbon_copy_node')) {
+    $operations['carbon_copy_node'] = [
+      'title' => t('Carbon Copy Node'),
+      'weight' => '100',
+      'url' => Url::fromRoute('carbon_copy_node.node.carbon_copy_node', ['node' => $entity->id()]),
+    ];
+  }
+
+  return $operations;
+}
+
+/**
+ * Implements hook_help().
+ */
+function carbon_copy_node_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.carbon_copy_node':
+      $text = file_get_contents(dirname(__FILE__) . '/README.md');
+      if (!\Drupal::moduleHandler()->moduleExists('markdown')) {
+        return '<pre>' . Html::escape($text) . '</pre>';
+      }
+      else {
+        // Use the Markdown filter to render the README.
+        $filter_manager = \Drupal::service('plugin.manager.filter');
+        $settings = \Drupal::configFactory()
+          ->get('markdown.settings')
+          ->getRawData();
+        $config = ['settings' => $settings];
+        $filter = $filter_manager->createInstance('markdown', $config);
+        return $filter->process($text, 'en');
+      }
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function carbon_copy_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (!array_key_exists('footer', $form)) {
+    return;
+  }
+
+  // Check the operation set on the form is 'carbon_copy_node'.
+  $form_object = $form_state->getFormObject();
+  if (!$form_object instanceof ContentEntityFormInterface) {
+    return;
+  }
+  if ($form_object->getOperation() !== 'carbon_copy_node') {
+    return;
+  }
+
+  // Check that the content entity being carbon copied is moderated.
+  if (!\Drupal::moduleHandler()->moduleExists('content_moderation')) {
+    return;
+  }
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
+  if (!$moderation_info->isModeratedEntity($form_object->getEntity())) {
+    return;
+  }
+
+  $form['moderation_state']['#group'] = 'footer';
+}
+
+/**
+ * Implements hook_node_access().
+ */
+function carbon_copy_node_node_access(NodeInterface $node, $operation, AccountInterface $account) {
+  // Check if the operation is 'carbon_copy_node'.
+  if ($operation != 'carbon_copy_node') {
+    return AccessResult::neutral();
+  }
+
+  $bundle = $node->bundle();
+  $permissions = ["carbon copy node {$bundle} content"];
+
+  $is_owner = $node->getOwnerId() == $account->id();
+  if ($is_owner) {
+    $permissions[] = "carbon copy node own {$bundle} content";
+  }
+
+  $access = AccessResult::allowedIfHasPermissions($account, $permissions, 'OR');
+  if ($access->isAllowed()) {
+    return $access;
+  }
+
+  return AccessResult::neutral();
+}

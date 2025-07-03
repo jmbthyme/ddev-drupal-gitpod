@@ -1,0 +1,11 @@
+carbon_copy_node.node.carbon_copy_node:
+  route_name: carbon_copy_node.node.carbon_copy_node
+  base_route: entity.node.canonical
+  title: 'Carbon Copy'
+  weight: 30
+
+carbon_copy_node.node.settings:
+  route_name: carbon_copy_node.settings
+  base_route: carbon_copy_node.settings
+  title: 'Node'
+  weight: -10
